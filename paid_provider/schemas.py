@@ -27,5 +27,5 @@ class SMessageAdd(BaseModel):
 class SMessageResponse(BaseModel):
     """Структура для ответа на обрабатываемые сообщения"""
 
-    status: str
+    ok: bool
     response: str
