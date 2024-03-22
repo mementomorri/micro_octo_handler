@@ -27,5 +27,7 @@ class SMessageAdd(BaseModel):
 
 
 class SMessageResponse(BaseModel):
+    """Шаблон для ответа на операцию обновления данных"""
+
     ok: bool
     response: str
