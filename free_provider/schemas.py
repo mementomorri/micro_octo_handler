@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict
+from datetime import datetime
 
 
 class SUserAdd(BaseModel):
@@ -7,6 +8,7 @@ class SUserAdd(BaseModel):
     paid_access: bool = False
     free_messages_left: int = 10
     refresh_at: int = 86400
+    # refresh_at: datetime = datetime.
 
 
 class SUserData(SUserAdd):
@@ -25,5 +27,5 @@ class SMessageAdd(BaseModel):
 
 
 class SMessageResponse(BaseModel):
-    status: str
+    ok: bool
     response: str

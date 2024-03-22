@@ -5,11 +5,13 @@ from schemas import SMessageAdd, SUserData, SMessageResponse
 
 from typing import Annotated
 import asyncio
+import os
 
 # Содаю отдельный роутер для для пространства /users
 router = APIRouter(prefix="/free_provider", tags=["Бесплатный провайдер"])
-
-USERS_API_URL = "http://0.0.0.0:8000/users"
+# USERS_TEST_PORT = os.environ.get("USERS_TEST_PORT")
+USERS_TEST_PORT = 8000
+USERS_API_URL = "http://0.0.0.0:" + str(USERS_TEST_PORT) + "/users"
 
 
 async def request_user_data(client, user_id):
@@ -30,8 +32,13 @@ async def handle_message(data: Annotated[SMessageAdd, Depends()]) -> SMessageRes
     user_data = await task(data.user_id)
     decoded_user = SUserData.model_validate_json(user_data[0])
     if decoded_user.free_messages_left > 0:
-        return {"status": "acepted", "response": data.message[::-1]}
+        return {"ok": True, "response": data.message[::-1]}
+    if decoded_user.paid_access:
+        return {
+            "ok": True,
+            "response": "Redirecting to paid service",
+        }
     return {
-        "status": "access denied",
-        "response": "redirecting to paid service",
+        "ok": False,
+        "response": "Access denied",
     }
