@@ -20,5 +20,11 @@ class SUserData(SUserAdd):
 class SUserId(BaseModel):
     """Шаблон ответа на добавление пользователя"""
 
-    status: int
+    ok: bool
     user_id: int
+
+
+class SOpStatus(BaseModel):
+    """Шаблон ответа на выполнение простой операции"""
+
+    ok: bool

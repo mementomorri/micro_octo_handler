@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from repo import UserRepository
-from schemas import SUserAdd, SUserData, SUserId
+from schemas import SUserAdd, SUserData, SUserId, SOpStatus
 
 from typing import Annotated
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["Микросервис работы �
 async def add_user(user: Annotated[SUserAdd, Depends()]) -> SUserId:
     """Путь на добавление пользователя"""
     user_id = await UserRepository.user_add(user)
-    return {"status": 200, "user_id": user_id}
+    return {"ok": True, "user_id": user_id}
 
 
 @router.get("")
@@ -29,3 +29,9 @@ async def get_user(user_id: int) -> SUserData:
     """Вернет данные о конкретном ползователе из БД"""
     user = await UserRepository.get_user(user_id)
     return user
+
+
+@router.patch("{user_id}/free_messages")
+async def patch_free_messages(user_id: int, messages_left: int) -> SOpStatus:
+    result = await UserRepository.patch_free_messages(user_id, messages_left)
+    return {"ok": True} if result else {"ok": False}

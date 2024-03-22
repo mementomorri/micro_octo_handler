@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from db import UsersOrm, new_session
 from schemas import SUserData, SUserAdd
 
@@ -44,3 +44,15 @@ class UserRepository:
             user_model = result.scalars().one()
             user_schema = SUserData.model_validate(user_model)
             return user_schema
+
+    @classmethod
+    async def patch_free_messages(cls, user_id: int, messages_left) -> bool:
+        async with new_session() as session:
+            q = (
+                update(UsersOrm)
+                .where(UsersOrm.id == user_id)
+                .values(free_messages_left=messages_left)
+            )
+            await session.execute(q)
+            await session.commit()
+            return True
