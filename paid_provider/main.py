@@ -1,7 +1,0 @@
-from router import router as paid_provider
-
-from fastapi import FastAPI
-
-
-app = FastAPI(title="paid_provider")
-app.include_router(paid_provider)
