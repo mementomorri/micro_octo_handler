@@ -28,9 +28,9 @@
 ## Сборка и запуск
 ### Контейнеры
 Можно сэимитировать разделение микросервисов на поды собрав каждый в отдельный докер контейнер. В папках `src/user_microservice`, `src/free_provider` и `src/paid_provider` имеются инструкции Dockerfile для сборки контейнера. Их можно собрать с помощью команд в комментариях к Dockerfile, а именно:
-- `src/user_microservice/Dockerfile` - собираем запускаем командой: ```docker build . --tag users_microservice && docker run -p 8000:8000 users_microservice```;
-- `src/free_provider` - собираем запускаем командой: ```docker build . --tag free_provider && docker run -p 2197:2197 free_provider```;
-- `src/user_microservice/Dockerfile` - собираем запускаем командой: ```docker build . --tag paid_provider && docker run -p 2198:2198 paid_provider```.
+- `src/user_microservice/Dockerfile` - собираем и запускаем командой: ```docker build . --tag users_microservice && docker run -p 8000:8000 users_microservice```;
+- `src/free_provider` - собираем и запускаем командой: ```docker build . --tag free_provider && docker run -p 2197:2197 free_provider```;
+- `src/user_microservice/Dockerfile` - собираем и запускаем командой: ```docker build . --tag paid_provider && docker run -p 2198:2198 paid_provider```.
 
 Каждый микросервис будет имееть соответствущий адес:
 - http://0.0.0.0:8000 для микросервиса пользователей;
