@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 COPY . .
 
-RUN pip install -r ../../requirements/paid_provider.txt
+RUN pip install -r paid_provider.txt
 
 CMD ["uvicorn", "provider:app", "--host", "0.0.0.0", "--port", "2198"]
 
