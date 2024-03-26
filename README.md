@@ -51,16 +51,16 @@ import uvicorn
 
 if __name__ == "__main__":
     uvicorn.run(
-        "src/user_microservice/microservice:app",
+        "user_microservice/microservice:app",
         host="0.0.0.0",
         port="8000",
         log_level="info",
     )
     uvicorn.run(
-        "src/free_provider/provider:app", host="0.0.0.0", port="2197", log_level="info"
+        "free_provider/provider:app", host="0.0.0.0", port="2197", log_level="info"
     )
     uvicorn.run(
-        "src/paid/provider/provider:app", host="0.0.0.0", port="2198", log_level="info"
+        "paid/provider/provider:app", host="0.0.0.0", port="2198", log_level="info"
     )
 ```
 
