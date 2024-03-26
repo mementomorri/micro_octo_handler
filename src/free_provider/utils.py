@@ -7,13 +7,16 @@ import asyncio
 from pydantic import ValidationError
 from schemas import SUserRead
 
-# В тестовом варианте храню переменные среды прямо в константах
-USERS_TEST_PORT = "8000"
-PAID_PROVIDER_PORT = "2198"
-BASE_URL = "http://0.0.0.0:"
-USERS_API_URL = BASE_URL + USERS_TEST_PORT
-AUTH_SECRET = "SECRET"
-ALGORITHM = "HS256"
+from conf import (
+    TOKEN_AUDIENCE,
+    USERS_TEST_PORT,
+    BASE_URL,
+    AUTH_SECRET,
+    TOKEN_ALGORITHM,
+    TOKEN_AUDIENCE,
+)
+
+USERS_API_URL = str(BASE_URL) + str(USERS_TEST_PORT)
 
 
 async def patch_user(
@@ -91,18 +94,21 @@ async def update_current_user(
     return True
 
 
-async def renew_user_data(token: str) -> dict:
+async def get_user_data(token: str) -> dict:
     """Обработка свежих данных о пользователе"""
     resp = await task(get_recent_user_data, token=token)
     resp = resp[0]
     return resp
 
 
-async def get_current_user(token: str) -> SUserRead:
+async def verify_user(token: str) -> SUserRead:
     """Декодирует токен и верифицирует его"""
     try:
         paylaod = jwt.decode(
-            token, AUTH_SECRET, algorithms=[ALGORITHM], audience="fastapi-users:auth"
+            token,
+            AUTH_SECRET,
+            algorithms=[TOKEN_ALGORITHM],
+            audience=TOKEN_AUDIENCE,
         )
         user_data = SUserRead(**paylaod)
         if datetime.fromtimestamp(user_data.exp) < datetime.utcnow():

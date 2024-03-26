@@ -8,10 +8,9 @@ import jwt
 from auth.manager import get_user_manager
 from auth.models import User
 
+from conf import AUTH_SECRET, TOKEN_ALGORITHM, TOKEN_LIFETIME
 
-SECRET_AUTH = "SECRET"
-# В тестовом варианте храню переменные среды прямо в константах
-SECRET_AUTH = "SECRET"
+
 cookie_transport = CookieTransport(cookie_name="octo_handler_user", cookie_max_age=3600)
 
 
@@ -25,7 +24,7 @@ class OctoJWTStrategy(JWTStrategy):
         data = {
             "sub": str(user.id),
             "aud": self.token_audience,
-            "exp": int(time() + self.lifetime_seconds),
+            "exp": int(time() + int(self.lifetime_seconds)),
             "email": str(user.email),
             "paid_access": bool(user.paid_access),
             "free_messages_left": int(user.free_messages_left),
@@ -35,7 +34,9 @@ class OctoJWTStrategy(JWTStrategy):
 
 
 def get_jwt_strategy() -> OctoJWTStrategy:
-    return OctoJWTStrategy(secret=SECRET_AUTH, lifetime_seconds=3600)
+    return OctoJWTStrategy(
+        secret=AUTH_SECRET, lifetime_seconds=TOKEN_LIFETIME, algorithm=TOKEN_ALGORITHM
+    )
 
 
 auth_backend = AuthenticationBackend(

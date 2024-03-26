@@ -1,42 +1,40 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 
-from utils import renew_user_data, get_current_user, update_current_user
+from utils import get_user_data, verify_user, update_current_user
 from schemas import SMessageAdd, SMessageResponse
 
 from typing import Annotated
+from conf import USERS_TEST_PORT, PAID_PROVIDER_PORT, BASE_URL
 
 
 # Содаю отдельный роутер для для пространства /free_provider
 router = APIRouter(prefix="/free_provider", tags=["Обработка сообщений"])
 
-# В тестовом варианте храню переменные среды прямо в константах
-USERS_TEST_PORT = "8000"
-PAID_PROVIDER_PORT = "2198"
-BASE_URL = "http://0.0.0.0:"
-USERS_API_URL = BASE_URL + USERS_TEST_PORT + "/user"
+USERS_API_URL = str(BASE_URL) + str(USERS_TEST_PORT) + "/user"
+PAID_PROVIDER_API_URL = str(BASE_URL) + str(PAID_PROVIDER_PORT) + "/paid_provider"
 
 
 @router.post("")
 async def handle_message(data: Annotated[SMessageAdd, Depends()]) -> SMessageResponse:
     """Конечная точка для бесплатной обработки сообщений"""
-    user_data = await get_current_user(data.token)
-    current_user_data = await renew_user_data(data.token)
-    current_messages_left = current_user_data["free_messages_left"]
+    await verify_user(data.token)
+    user_data = await get_user_data(data.token)
+    current_messages_left = user_data["free_messages_left"]
     if current_messages_left > 0:
         await update_current_user(
-            user_data.sub,
-            user_data.email,
+            user_data["id"],
+            user_data["email"],
             current_messages_left - 1,
-            current_user_data["paid_access"],
-            current_user_data["refresh_at"],
+            user_data["paid_access"],
+            user_data["refresh_at"],
             data.token,
         )
         return SMessageResponse.model_validate(
             {"ok": True, "response": data.message[::-1]}  # Имитация обработки сообщения
         )
-    elif current_user_data["paid_access"]:
-        return RedirectResponse(BASE_URL + PAID_PROVIDER_PORT + "/paid_provider", 303)
+    elif user_data["paid_access"]:
+        return RedirectResponse(str(PAID_PROVIDER_API_URL), 303)
     else:
         raise HTTPException(
             403,
