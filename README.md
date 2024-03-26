@@ -45,26 +45,7 @@
 ```shell
 cd requirements; python -m venv venv; source venv/bin/activate; pip install -r dev.txt
 ```
-и запустить сервисы через uvicorn из каждой папки `uvicorn microservice:app --reload --port=8000` или воспользовавшись аналогичной командой в скрипте:
-```python
-import uvicorn
-
-
-if __name__ == "__main__":
-    uvicorn.run(
-        "user_microservice/microservice:app",
-        host="0.0.0.0",
-        port="8000",
-        log_level="info",
-    )
-    uvicorn.run(
-        "free_provider/provider:app", host="0.0.0.0", port="2197", log_level="info"
-    )
-    uvicorn.run(
-        "paid/provider/provider:app", host="0.0.0.0", port="2198", log_level="info"
-    )
-```
-
+и запустить сервисы через `uvicorn` из каждой папки, например `uvicorn microservice:app --reload --port=8000`
 ## Не успел вовремя, но планирую добавить:
 - реализовать полноценное, углубленное тестирование;
 - провести тестирование на размещение в изолированной среде;
