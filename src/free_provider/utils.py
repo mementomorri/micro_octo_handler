@@ -1,8 +1,8 @@
-from datetime import datetime
 from fastapi import HTTPException
 import httpx
 import jwt
 from typing import Callable
+import datetime
 import asyncio
 from pydantic import ValidationError
 from schemas import SUserRead
@@ -98,6 +98,16 @@ async def get_user_data(token: str) -> dict:
     """Обработка свежих данных о пользователе"""
     resp = await task(get_recent_user_data, token=token)
     resp = resp[0]
+    today = datetime.date.today()
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    refresh_date = datetime.date.fromisoformat(resp["refresh_at"])
+    if refresh_date < today:
+        update_ok = await update_current_user(
+            resp["id"], resp["email"], 10, resp["paid_access"], str(tomorrow), token
+        )
+        if update_ok:
+            resp["free_messages_left"] = 10
+            resp["refresh_at"] = str(tomorrow)
     return resp
 
 
@@ -111,7 +121,7 @@ async def verify_user(token: str) -> SUserRead:
             audience=TOKEN_AUDIENCE,
         )
         user_data = SUserRead(**paylaod)
-        if datetime.fromtimestamp(user_data.exp) < datetime.utcnow():
+        if datetime.datetime.fromtimestamp(user_data.exp) < datetime.datetime.utcnow():
             raise HTTPException(
                 401, {"details": "Токен просрочен"}, {"WWW-Authenticate": "Bearer"}
             )
